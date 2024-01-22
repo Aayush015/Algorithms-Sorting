@@ -1,29 +1,46 @@
+/*
+    Project - QuickSort Algorithm
+    Author - Aayush Kafle
+ */
+import java.io.*;
 import java.util.Random;
 
 public class quick_sort {
-    public static void main(String[] args) {
-        int[] arr = {12, 4, 5, 6, 7, 3, 1, 15, 8, 9};
-        quickSort(arr, 0, arr.length - 1);
 
-        System.out.println("Sorted Array:");
-        for (int num : arr) {
-            System.out.print(num + " ");
-        }
+    /*
+        Swap two doubles.
+     */
+    static void swap(double[] arr, int i, int j) {
+        double temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 
-    public static void quickSort(int[] arr, int low, int high) {
+    /*
+        Get Random Pivot
+     */
+    static int generateRandomPivot(int low, int high) {
+        Random random = new Random();
+        return random.nextInt(high - low + 1) + low;
+    }
+
+    /*
+        Implement randomized quicksort and recurse.
+     */
+    static void randomizedQuickSort(double[] arr, int low, int high) {
         if (low < high) {
-            int pivotIndex = partition(arr, low, high);
-            quickSort(arr, low, pivotIndex - 1);
-            quickSort(arr, pivotIndex + 1, high);
+            int pivotIndex = randomizedPartition(arr, low, high);
+            randomizedQuickSort(arr, low, pivotIndex - 1);
+            randomizedQuickSort(arr, pivotIndex + 1, high);
         }
     }
 
-    public static int partition(int[] arr, int low, int high) {
-        int pivotIndex = getRandomPivotIndex(low, high);
-        int pivotValue = arr[pivotIndex];
-
-        // Move the pivot element to the end of the array
+    /*
+        Implement quick sort for two numbers in the array.
+     */
+    static int randomizedPartition(double[] arr, int low, int high) {
+        int pivotIndex = generateRandomPivot(low, high);
+        double pivotValue = arr[pivotIndex];
         swap(arr, pivotIndex, high);
 
         int i = low - 1;
@@ -35,20 +52,66 @@ public class quick_sort {
             }
         }
 
-        // Move the pivot element back to its correct position
         swap(arr, i + 1, high);
-
         return i + 1;
     }
 
-    public static int getRandomPivotIndex(int low, int high) {
-        Random rand = new Random();
-        return rand.nextInt(high - low + 1) + low;
+    /*
+        Read Input and Add it to the array.
+     */
+    private static int readDataFromFile(String file, double[] arr) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line;
+        int count = 0;
+
+        while ((line = reader.readLine()) != null) {
+            arr[count] = Double.parseDouble(line);
+            count++;
+        }
+
+        reader.close();
+        return count;
     }
 
-    public static void swap(int[] arr, int i, int j) {
-        int temp = arr[i];
-        arr[i] = arr[j];
-        arr[j] = temp;
+    public static void main(String[] args) {
+        try {
+            int fileSize = 20;
+            String inputFile = "E:\\Project\\random_numbers_" + fileSize + ".txt";  // Provide input from SSD. 
+            int arraySize = (int) Math.pow(2, 20);
+
+            // array to store the input array
+            double[] arr = new double[arraySize];
+
+            // Read data from file
+            long startTime = System.nanoTime();
+            // n stores the number of inputs
+            int n = readDataFromFile(inputFile, arr);
+            long endTime = System.nanoTime();
+
+            // Calculate and print loading time
+            long loadingTime = endTime - startTime;
+            System.out.println("Doubles");
+            System.out.println("Data loading time: " + loadingTime + " nanoseconds");
+
+            // Start the timer for the sorting algorithm
+            startTime = System.nanoTime();
+
+            // Call the randomized quicksort algorithm
+            randomizedQuickSort(arr, 0, n);
+
+            for (int i=0; i<n; i++){
+                System.out.print(arr[i] + ", ");
+            }
+            System.out.println();
+            // Stop the timer
+            endTime = System.nanoTime();
+
+            // Calculate and print running time
+            long runningTime = endTime - startTime;
+            System.out.println("Randomized Quicksort running time: " + runningTime + " nanoseconds");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
